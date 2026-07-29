@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terraria Steam Achievements Checklist</title>
+<meta name="description" content="Track your progress through all 137 Terraria Steam achievements.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <button class="drawer-toggle" id="drawerToggle" aria-label="Open menu" aria-expanded="false">☰</button>
+  <h1>Terraria <span>Achievements</span> Checklist</h1>
+  <div class="topbar-progress">
+    <div class="progress-track"><div class="progress-fill" id="overallFill"></div></div>
+    <span id="overallLabel">0 / 137</span>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="sidebar" id="sidebar">
+    <div class="sidebar-inner">
+      <a class="side-link" href="#" data-target="top">🏠 Overview</a>
+      <div id="sideCategoryList"></div>
+      <hr>
+      <button class="side-btn side-btn-accent" id="steamSyncBtn">🔄 Sync from Steam</button>
+      <button class="side-btn" id="resetBtn">Reset all progress</button>
+      <button class="side-btn" id="exportBtn">Export progress</button>
+      <label class="side-btn side-btn-file">
+        Import progress
+        <input type="file" id="importInput" accept="application/json" hidden>
+      </label>
+    </div>
+  </nav>
+
+  <main id="top">
+    <section class="controls">
+      <input type="text" id="searchBox" placeholder="Search achievements...">
+      <div class="filter-group" id="filterGroup">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="todo">Not Obtained</button>
+        <button class="filter-btn" data-filter="done">Obtained</button>
+      </div>
+      <div class="sort-group">
+        <label for="sortSelect">Sort by</label>
+        <select id="sortSelect">
+          <option value="rarity-desc">Most common first</option>
+          <option value="rarity-asc">Rarest first</option>
+          <option value="alpha">Alphabetical</option>
+        </select>
+      </div>
+    </section>
+
+    <div id="categoriesContainer"></div>
+    <p id="noResults" class="no-results" hidden>No achievements match your search.</p>
+  </main>
+</div>
+
+<div class="modal-backdrop" id="steamModalBackdrop" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="steamModalTitle">
+    <div class="modal-header">
+      <h2 id="steamModalTitle">🔄 Sync from Steam</h2>
+      <button class="modal-close" id="steamModalClose" aria-label="Close">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="modal-note">
+        This tool is a static page with no server of its own, and Steam's API doesn't allow
+        websites to read your data directly (CORS). So instead: you open your own achievement
+        data straight from Steam in a new tab, then paste it back here. Your API key and ID
+        are only ever stored in <em>this browser</em> — nothing is sent to us.
+      </p>
+
+      <ol class="modal-steps">
+        <li>
+          Get a free Steam Web API key at
+          <a href="https://steamcommunity.com/dev/apikey" target="_blank" rel="noopener">steamcommunity.com/dev/apikey</a>.
+        </li>
+        <li>
+          Find your SteamID64 (a 17-digit number) on
+          <a href="https://store.steampowered.com/account/" target="_blank" rel="noopener">your Steam account page</a>.
+        </li>
+        <li>Make sure <strong>Game details</strong> is set to Public under your Steam privacy settings, then fill in below:</li>
+      </ol>
+
+      <div class="modal-row">
+        <label for="steamApiKey">API key</label>
+        <input type="text" id="steamApiKey" placeholder="e.g. 1A2B3C4D5E6F7G8H9I0J...">
+      </div>
+      <div class="modal-row">
+        <label for="steamId64">SteamID64</label>
+        <input type="text" id="steamId64" placeholder="e.g. 76561197960287930">
+      </div>
+
+      <button class="side-btn side-btn-accent" id="openSteamDataBtn" type="button">Open my Steam achievement data ↗</button>
+
+      <p class="modal-note">
+        A new tab will open showing raw JSON text. Select all (Ctrl/Cmd+A), copy it, then paste
+        it into the box below.
+      </p>
+
+      <textarea id="steamPasteBox" rows="6" placeholder="Paste the JSON from that tab here..."></textarea>
+
+      <button class="side-btn side-btn-accent" id="importSteamJsonBtn" type="button">Import unlocked achievements</button>
+      <p id="steamSyncResult" class="modal-note"></p>
+    </div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
