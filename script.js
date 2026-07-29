@@ -198,7 +198,6 @@
   });
 
   // Steam sync
-  const STEAM_KEY_STORAGE = "terraria-steam-apikey";
   const STEAM_ID_STORAGE = "terraria-steam-id64";
 
   function normalizeName(s) {
@@ -208,12 +207,10 @@
   const nameIndex = new Map(ACHIEVEMENTS.map((a) => [normalizeName(a.name), a.id]));
 
   const steamModalBackdrop = document.getElementById("steamModalBackdrop");
-  const steamApiKeyInput = document.getElementById("steamApiKey");
   const steamId64Input = document.getElementById("steamId64");
   const steamPasteBox = document.getElementById("steamPasteBox");
   const steamSyncResult = document.getElementById("steamSyncResult");
 
-  steamApiKeyInput.value = localStorage.getItem(STEAM_KEY_STORAGE) || "";
   steamId64Input.value = localStorage.getItem(STEAM_ID_STORAGE) || "";
 
   function openSteamModal() {
@@ -233,47 +230,46 @@
   });
 
   document.getElementById("openSteamDataBtn").addEventListener("click", () => {
-    const key = steamApiKeyInput.value.trim();
     const id = steamId64Input.value.trim();
-    if (!key || !/^\d{17}$/.test(id)) {
-      steamSyncResult.textContent = "Enter a valid API key and a 17-digit SteamID64 first.";
+    if (!/^\d{17}$/.test(id)) {
+      steamSyncResult.textContent = "Enter a valid 17-digit SteamID64 first.";
       return;
     }
-    localStorage.setItem(STEAM_KEY_STORAGE, key);
     localStorage.setItem(STEAM_ID_STORAGE, id);
-    const url = `https://api.steampowered.com/ISteamUserStats/GetPlayerAchievements/v0001/?appid=105600&key=${encodeURIComponent(key)}&steamid=${encodeURIComponent(id)}&l=english`;
+    const url = `https://steamcommunity.com/profiles/${encodeURIComponent(id)}/stats/105600/achievements/?xml=1`;
     window.open(url, "_blank", "noopener");
     steamSyncResult.textContent = "";
   });
 
-  document.getElementById("importSteamJsonBtn").addEventListener("click", () => {
+  document.getElementById("importSteamDataBtn").addEventListener("click", () => {
     const raw = steamPasteBox.value.trim();
     if (!raw) {
-      steamSyncResult.textContent = "Paste the JSON from the Steam tab first.";
+      steamSyncResult.textContent = "Paste the XML from the Steam tab first.";
       return;
     }
-    let data;
-    try {
-      data = JSON.parse(raw);
-    } catch {
-      steamSyncResult.textContent = "That doesn't look like valid JSON.";
+
+    const doc = new DOMParser().parseFromString(raw, "text/xml");
+    if (doc.querySelector("parsererror")) {
+      steamSyncResult.textContent = "That doesn't look like valid XML. Make sure you copied the whole page.";
       return;
     }
-    const achievements = data?.playerstats?.achievements;
-    if (!data?.playerstats?.success || !Array.isArray(achievements)) {
-      const err = data?.playerstats?.error;
-      steamSyncResult.textContent = err
-        ? `Steam returned an error: ${err}`
-        : "Couldn't find achievement data in that JSON.";
+
+    const privacyState = doc.querySelector("privacyState")?.textContent;
+    const achievementEls = doc.querySelectorAll("achievements > achievement");
+    if (!achievementEls.length) {
+      steamSyncResult.textContent =
+        privacyState && privacyState !== "public"
+          ? "That profile's game details aren't public, so Steam didn't include achievement data."
+          : "Couldn't find achievement data in that. Make sure you pasted the whole page and that the profile owns Terraria.";
       return;
     }
 
     let matched = 0;
     let newlyDone = 0;
     let unmatched = 0;
-    achievements.forEach((entry) => {
-      if (!entry.achieved) return;
-      const label = entry.name || entry.apiname || "";
+    achievementEls.forEach((el) => {
+      if (el.getAttribute("closed") !== "1") return;
+      const label = el.querySelector("name")?.textContent || el.querySelector("apiname")?.textContent || "";
       const id = nameIndex.get(normalizeName(label));
       if (!id) {
         unmatched++;

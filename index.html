@@ -65,28 +65,24 @@
     </div>
     <div class="modal-body">
       <p class="modal-note">
-        This tool is a static page with no server of its own, and Steam's API doesn't allow
-        websites to read your data directly (CORS). So instead: you open your own achievement
-        data straight from Steam in a new tab, then paste it back here. Your API key and ID
-        are only ever stored in <em>this browser</em> — nothing is sent to us.
+        This tool is a static page with no server of its own, and Steam doesn't allow websites
+        to read your data directly (CORS). So instead: you open your own public achievement
+        page straight from Steam in a new tab, then paste it back here. No API key needed —
+        your SteamID is only ever stored in <em>this browser</em>, nothing is sent to us.
       </p>
 
       <ol class="modal-steps">
         <li>
-          Get a free Steam Web API key at
-          <a href="https://steamcommunity.com/dev/apikey" target="_blank" rel="noopener">steamcommunity.com/dev/apikey</a>.
+          Make sure <strong>Game details</strong> is set to Public under your
+          <a href="https://steamcommunity.com/my/edit/settings" target="_blank" rel="noopener">Steam privacy settings</a>.
         </li>
         <li>
           Find your SteamID64 (a 17-digit number) on
-          <a href="https://store.steampowered.com/account/" target="_blank" rel="noopener">your Steam account page</a>.
+          <a href="https://store.steampowered.com/account/" target="_blank" rel="noopener">your Steam account page</a>,
+          then fill it in below:
         </li>
-        <li>Make sure <strong>Game details</strong> is set to Public under your Steam privacy settings, then fill in below:</li>
       </ol>
 
-      <div class="modal-row">
-        <label for="steamApiKey">API key</label>
-        <input type="text" id="steamApiKey" placeholder="e.g. 1A2B3C4D5E6F7G8H9I0J...">
-      </div>
       <div class="modal-row">
         <label for="steamId64">SteamID64</label>
         <input type="text" id="steamId64" placeholder="e.g. 76561197960287930">
@@ -95,13 +91,13 @@
       <button class="side-btn side-btn-accent" id="openSteamDataBtn" type="button">Open my Steam achievement data ↗</button>
 
       <p class="modal-note">
-        A new tab will open showing raw JSON text. Select all (Ctrl/Cmd+A), copy it, then paste
+        A new tab will open showing raw XML text. Select all (Ctrl/Cmd+A), copy it, then paste
         it into the box below.
       </p>
 
-      <textarea id="steamPasteBox" rows="6" placeholder="Paste the JSON from that tab here..."></textarea>
+      <textarea id="steamPasteBox" rows="6" placeholder="Paste the XML from that tab here..."></textarea>
 
-      <button class="side-btn side-btn-accent" id="importSteamJsonBtn" type="button">Import unlocked achievements</button>
+      <button class="side-btn side-btn-accent" id="importSteamDataBtn" type="button">Import unlocked achievements</button>
       <p id="steamSyncResult" class="modal-note"></p>
     </div>
   </div>
