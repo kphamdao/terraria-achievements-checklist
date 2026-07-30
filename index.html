@@ -5,7 +5,29 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Terraria Steam Achievements Checklist</title>
 <meta name="description" content="Track your progress through all 137 Terraria Steam achievements.">
-<link rel="stylesheet" href="style.css">
+<script>
+(function () {
+  var VERSION_KEY = "terraria-app-version";
+  fetch("version.txt?_=" + Date.now(), { cache: "no-store" })
+    .then(function (r) { return r.text(); })
+    .then(function (v) {
+      v = v.trim();
+      if (!v) return;
+      var stored = localStorage.getItem(VERSION_KEY);
+      if (stored && stored !== v) {
+        // A newer build exists: remember it, then force a fresh (non-cached)
+        // reload so the updated HTML/CSS/JS actually get fetched.
+        localStorage.setItem(VERSION_KEY, v);
+        location.replace(location.pathname + "?v=" + encodeURIComponent(v));
+      } else {
+        if (!stored) localStorage.setItem(VERSION_KEY, v);
+        if (location.search) history.replaceState(null, "", location.pathname);
+      }
+    })
+    .catch(function () {});
+})();
+</script>
+<link rel="stylesheet" href="style.css?v=1">
 </head>
 <body>
 
@@ -103,7 +125,7 @@
   </div>
 </div>
 
-<script src="data.js"></script>
-<script src="script.js"></script>
+<script src="data.js?v=1"></script>
+<script src="script.js?v=1"></script>
 </body>
 </html>
