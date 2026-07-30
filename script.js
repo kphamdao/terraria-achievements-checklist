@@ -279,7 +279,10 @@
 
     const doc = new DOMParser().parseFromString(raw_xml, "text/xml");
     if (doc.querySelector("parsererror")) {
-      steamSyncResult.textContent = "Steam returned something unexpected. Double-check the profile link/ID and try again.";
+      const steamError = raw_xml.match(/profile_fatalerror_message">([^<]+)</)?.[1];
+      steamSyncResult.textContent = steamError
+        ? `Steam says: "${steamError.trim()}" — check that the profile isn't private and that Game details is set to Public.`
+        : "Steam returned something unexpected. Double-check the profile link/ID and try again.";
       return;
     }
 
