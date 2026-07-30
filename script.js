@@ -204,6 +204,19 @@
     return s.toLowerCase().replace(/[^a-z0-9]+/g, "");
   }
 
+  // Accepts a full profile URL, a bare vanity name, or a raw 17-digit SteamID64,
+  // and returns { kind: "id" | "vanity", value } for building the achievements URL.
+  function parseSteamIdentifier(raw) {
+    let s = raw.trim().replace(/^https?:\/\//i, "").replace(/\/+$/, "");
+    const profilesMatch = s.match(/steamcommunity\.com\/profiles\/(\d{17})/i);
+    if (profilesMatch) return { kind: "id", value: profilesMatch[1] };
+    const idMatch = s.match(/steamcommunity\.com\/id\/([^/]+)/i);
+    if (idMatch) return { kind: "vanity", value: idMatch[1] };
+    if (/^\d{17}$/.test(s)) return { kind: "id", value: s };
+    if (s && !s.includes("/")) return { kind: "vanity", value: s };
+    return null;
+  }
+
   const nameIndex = new Map(ACHIEVEMENTS.map((a) => [normalizeName(a.name), a.id]));
 
   const steamModalBackdrop = document.getElementById("steamModalBackdrop");
@@ -230,13 +243,15 @@
   });
 
   document.getElementById("openSteamDataBtn").addEventListener("click", () => {
-    const id = steamId64Input.value.trim();
-    if (!/^\d{17}$/.test(id)) {
-      steamSyncResult.textContent = "Enter a valid 17-digit SteamID64 first.";
+    const raw = steamId64Input.value;
+    const parsed = parseSteamIdentifier(raw);
+    if (!parsed) {
+      steamSyncResult.textContent = "Enter your Steam profile URL, custom name, or SteamID64 first.";
       return;
     }
-    localStorage.setItem(STEAM_ID_STORAGE, id);
-    const url = `https://steamcommunity.com/profiles/${encodeURIComponent(id)}/stats/105600/achievements/?xml=1`;
+    localStorage.setItem(STEAM_ID_STORAGE, raw.trim());
+    const segment = parsed.kind === "id" ? "profiles" : "id";
+    const url = `https://steamcommunity.com/${segment}/${encodeURIComponent(parsed.value)}/stats/105600/achievements/?xml=1`;
     window.open(url, "_blank", "noopener");
     steamSyncResult.textContent = "";
   });
