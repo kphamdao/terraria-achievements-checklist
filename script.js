@@ -256,6 +256,24 @@
     steamSyncResult.textContent = "";
   });
 
+  document.getElementById("pasteFromClipboardBtn").addEventListener("click", async () => {
+    if (!navigator.clipboard?.readText) {
+      steamSyncResult.textContent = "Your browser won't let a page read the clipboard directly — paste manually below with Ctrl/Cmd+V.";
+      return;
+    }
+    try {
+      const text = await navigator.clipboard.readText();
+      if (!text.trim()) {
+        steamSyncResult.textContent = "Your clipboard looks empty. Copy the Steam page first, then try again.";
+        return;
+      }
+      steamPasteBox.value = text;
+      steamSyncResult.textContent = "Pasted from clipboard. Click Import to finish.";
+    } catch {
+      steamSyncResult.textContent = "Couldn't read the clipboard (browser blocked it) — paste manually below with Ctrl/Cmd+V.";
+    }
+  });
+
   document.getElementById("importSteamDataBtn").addEventListener("click", () => {
     const raw = steamPasteBox.value.trim();
     if (!raw) {
