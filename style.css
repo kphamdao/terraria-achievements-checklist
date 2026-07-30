@@ -270,6 +270,16 @@ a { color: var(--link); }
   font-size: 0.88rem;
 }
 
+.modal-row-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.modal-inline-link {
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
 
 main {
   flex: 1;
