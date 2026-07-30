@@ -190,6 +190,11 @@ a { color: var(--link); }
   font-weight: 600;
 }
 .side-btn-accent:hover { filter: brightness(1.08); }
+.side-btn:disabled {
+  opacity: 0.6;
+  cursor: default;
+  filter: none;
+}
 
 .modal-backdrop {
   position: fixed;
@@ -247,30 +252,6 @@ a { color: var(--link); }
   margin: 0;
 }
 
-.modal-steps {
-  font-size: 0.85rem;
-  color: var(--text-dim);
-  padding-left: 20px;
-  margin: 0;
-  line-height: 1.5;
-}
-.modal-steps li { margin-bottom: 4px; }
-
-.modal-step {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 12px;
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-  background: var(--bg-alt);
-}
-.modal-step h3 {
-  margin: 0;
-  font-size: 0.92rem;
-  color: var(--accent-2);
-}
-
 .modal-row {
   display: flex;
   flex-direction: column;
@@ -289,16 +270,6 @@ a { color: var(--link); }
   font-size: 0.88rem;
 }
 
-#steamPasteBox {
-  padding: 8px 10px;
-  border-radius: var(--radius);
-  border: 1px solid var(--border);
-  background: var(--bg-alt);
-  color: var(--text);
-  font-size: 0.8rem;
-  font-family: monospace;
-  resize: vertical;
-}
 
 main {
   flex: 1;

@@ -27,7 +27,7 @@
     .catch(function () {});
 })();
 </script>
-<link rel="stylesheet" href="style.css?v=2">
+<link rel="stylesheet" href="style.css?v=3">
 </head>
 <body>
 
@@ -87,42 +87,30 @@
     </div>
     <div class="modal-body">
       <p class="modal-note">
-        This tool is a static page with no server of its own, and Steam doesn't allow websites
-        to read your data directly (CORS). No API key needed either way — your SteamID is only
-        ever stored in <em>this browser</em>, nothing is sent to us.
+        Paste your Steam profile link (or custom name, or SteamID64) and we'll fetch your
+        unlocked achievements automatically. Requests go through a small proxy we run just to
+        get around Steam's browser restrictions — nothing is stored anywhere but your SteamID
+        in <em>this browser</em>.
       </p>
 
-      <div class="modal-step">
-        <h3>Step 1 — Get your data from Steam</h3>
-        <p class="modal-note">
-          Make sure <strong>Game details</strong> is set to Public under your
-          <a href="https://steamcommunity.com/my/edit/settings" target="_blank" rel="noopener">Steam privacy settings</a>.
-        </p>
-        <div class="modal-row">
-          <label for="steamId64">Steam profile URL, custom name, or SteamID64</label>
-          <input type="text" id="steamId64" placeholder="e.g. steamcommunity.com/id/YourName or 76561197960287930">
-        </div>
-        <p class="modal-note">
-          Tip: open <a href="https://steamcommunity.com/my/" target="_blank" rel="noopener">steamcommunity.com/my</a>
-          (redirects to your own profile) and copy whatever URL you land on.
-        </p>
-        <button class="side-btn side-btn-accent" id="openSteamDataBtn" type="button">Open my Steam achievement data ↗</button>
-        <p class="modal-note">A new tab opens with raw XML text. Select all (Ctrl/Cmd+A) and copy it (Ctrl/Cmd+C).</p>
+      <p class="modal-note">
+        Make sure <strong>Game details</strong> is set to Public under your
+        <a href="https://steamcommunity.com/my/edit/settings" target="_blank" rel="noopener">Steam privacy settings</a>,
+        or this will come back empty.
+      </p>
+
+      <div class="modal-row">
+        <label for="steamId64">Steam profile URL, custom name, or SteamID64</label>
+        <input type="text" id="steamId64" placeholder="e.g. steamcommunity.com/id/YourName or 76561197960287930">
       </div>
 
-      <div class="modal-step">
-        <h3>Step 2 — Bring it back here</h3>
-        <button class="side-btn side-btn-accent" id="pasteFromClipboardBtn" type="button">📋 Paste from clipboard</button>
-        <p class="modal-note">Or paste manually (Ctrl/Cmd+V) into the box below:</p>
-        <textarea id="steamPasteBox" rows="5" placeholder="Paste the XML from that tab here..."></textarea>
-        <button class="side-btn side-btn-accent" id="importSteamDataBtn" type="button">Import unlocked achievements</button>
-      </div>
+      <button class="side-btn side-btn-accent" id="syncNowBtn" type="button">🔄 Sync now</button>
       <p id="steamSyncResult" class="modal-note"></p>
     </div>
   </div>
 </div>
 
-<script src="data.js?v=2"></script>
-<script src="script.js?v=2"></script>
+<script src="data.js?v=3"></script>
+<script src="script.js?v=3"></script>
 </body>
 </html>

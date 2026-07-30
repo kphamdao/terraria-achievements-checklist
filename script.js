@@ -219,10 +219,12 @@
 
   const nameIndex = new Map(ACHIEVEMENTS.map((a) => [normalizeName(a.name), a.id]));
 
+  const WORKER_URL = "https://terraria-achievement-tracker.kennethphamdao.workers.dev/";
+
   const steamModalBackdrop = document.getElementById("steamModalBackdrop");
   const steamId64Input = document.getElementById("steamId64");
-  const steamPasteBox = document.getElementById("steamPasteBox");
   const steamSyncResult = document.getElementById("steamSyncResult");
+  const syncNowBtn = document.getElementById("syncNowBtn");
 
   steamId64Input.value = localStorage.getItem(STEAM_ID_STORAGE) || "";
 
@@ -242,7 +244,7 @@
     if (e.target === steamModalBackdrop) closeSteamModal();
   });
 
-  document.getElementById("openSteamDataBtn").addEventListener("click", () => {
+  syncNowBtn.addEventListener("click", async () => {
     const raw = steamId64Input.value;
     const parsed = parseSteamIdentifier(raw);
     if (!parsed) {
@@ -250,40 +252,34 @@
       return;
     }
     localStorage.setItem(STEAM_ID_STORAGE, raw.trim());
-    const segment = parsed.kind === "id" ? "profiles" : "id";
-    const url = `https://steamcommunity.com/${segment}/${encodeURIComponent(parsed.value)}/stats/105600/achievements/?xml=1`;
-    window.open(url, "_blank", "noopener");
-    steamSyncResult.textContent = "";
-  });
 
-  document.getElementById("pasteFromClipboardBtn").addEventListener("click", async () => {
-    if (!navigator.clipboard?.readText) {
-      steamSyncResult.textContent = "Your browser won't let a page read the clipboard directly — paste manually below with Ctrl/Cmd+V.";
-      return;
-    }
+    syncNowBtn.disabled = true;
+    syncNowBtn.textContent = "Syncing…";
+    steamSyncResult.textContent = "";
+
+    let raw_xml;
     try {
-      const text = await navigator.clipboard.readText();
-      if (!text.trim()) {
-        steamSyncResult.textContent = "Your clipboard looks empty. Copy the Steam page first, then try again.";
+      const resp = await fetch(`${WORKER_URL}?id=${encodeURIComponent(parsed.value)}`);
+      raw_xml = await resp.text();
+      if (!resp.ok) {
+        let msg = "Sync failed.";
+        try {
+          msg = JSON.parse(raw_xml).error || msg;
+        } catch {}
+        steamSyncResult.textContent = `Sync failed: ${msg}`;
         return;
       }
-      steamPasteBox.value = text;
-      steamSyncResult.textContent = "Pasted from clipboard. Click Import to finish.";
     } catch {
-      steamSyncResult.textContent = "Couldn't read the clipboard (browser blocked it) — paste manually below with Ctrl/Cmd+V.";
-    }
-  });
-
-  document.getElementById("importSteamDataBtn").addEventListener("click", () => {
-    const raw = steamPasteBox.value.trim();
-    if (!raw) {
-      steamSyncResult.textContent = "Paste the XML from the Steam tab first.";
+      steamSyncResult.textContent = "Couldn't reach the sync service. Check your connection and try again.";
       return;
+    } finally {
+      syncNowBtn.disabled = false;
+      syncNowBtn.textContent = "🔄 Sync now";
     }
 
-    const doc = new DOMParser().parseFromString(raw, "text/xml");
+    const doc = new DOMParser().parseFromString(raw_xml, "text/xml");
     if (doc.querySelector("parsererror")) {
-      steamSyncResult.textContent = "That doesn't look like valid XML. Make sure you copied the whole page.";
+      steamSyncResult.textContent = "Steam returned something unexpected. Double-check the profile link/ID and try again.";
       return;
     }
 
@@ -293,7 +289,7 @@
       steamSyncResult.textContent =
         privacyState && privacyState !== "public"
           ? "That profile's game details aren't public, so Steam didn't include achievement data."
-          : "Couldn't find achievement data in that. Make sure you pasted the whole page and that the profile owns Terraria.";
+          : "Couldn't find achievement data for that profile. Make sure it owns Terraria.";
       return;
     }
 
